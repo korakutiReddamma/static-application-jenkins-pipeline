@@ -1,0 +1,31 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // Perform any build steps required for your static page application
+                // For example, copying static files or running build scripts
+                script{
+                sh """    
+                zip app-$BUILD_NUMBER.zip *
+                aws s3 cp app-$BUILD_NUMBER.zip s3://jenkins-satatic/
+                """
+                }
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                // Perform the deployment of your static page application
+                // This could involve copying the files to a web server or cloud storage
+            }
+        }
+    }
+    
+    post {
+        always {
+            // You can include any post-build actions here if needed
+        }
+    }
+}
