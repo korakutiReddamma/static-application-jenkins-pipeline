@@ -4,27 +4,22 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                // Perform any build steps required for your static page application
-                // For example, copying static files or running build scripts
-                script{
-                sh """    
-                zip app-$BUILD_NUMBER.zip *
-                aws s3 cp app-$BUILD_NUMBER.zip s3://jenkins-satatic/
-                """
-                }
+                sh 'zip app-$BUILD_NUMBER.zip *'
+                sh 'aws s3 cp app-$BUILD_NUMBER.zip s3://jenkins-satatic/'
             }
         }
+        
         stage('Deploy') {
             steps {
-                // Perform the deployment of your static page application
-                // This could involve copying the files to a web server or cloud storage
+                sh """
+                aws s3 cp s3://jenkins-satatic/app-2.zip .
+                scp app-2.zip root@172.31.0.101:/root 
+                ssh root@172.31.0.101 'unzip app-2.zip && cp -r app.html /var/www/html'
+                """
+                
             }
         }
     }
     
-    post {
-        always {
-            // You can include any post-build actions here if needed
-        }
-    }
+    
 }
